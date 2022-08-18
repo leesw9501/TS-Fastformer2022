@@ -36,7 +36,7 @@ def load_forecast_csv(root, name, target):
         data = data.iloc[[target]]
         
     data = data.to_numpy()
-    if name == 'ETTh1' or name == 'ETTh2' or name == 'device1':
+    if name == 'ETTh1' or name == 'ETTh2' or name == 'KPVPG':
         train_slice = slice(None, 12*30*24)
         valid_slice = slice(12*30*24, 16*30*24)
         test_slice = slice(16*30*24, 20*30*24)
@@ -83,13 +83,11 @@ class forecast_Dataset(Dataset):
                         slice(12*30*24 - self.LT_len, 12*30*24+4*30*24), 
                         slice(12*30*24+4*30*24 - self.LT_len, 12*30*24+8*30*24)]
             sel_slice = slice_arr[self.set_type]
-            
         elif self.name == 'ETTm1' or self.name == 'ETTm2':
             slice_arr = [slice(None, 12*30*24*4), 
                         slice(12*30*24*4 - self.LT_len, 12*30*24*4+4*30*24*4), 
                         slice(12*30*24*4+4*30*24*4 - self.LT_len, 12*30*24*4+8*30*24*4)]
             sel_slice = slice_arr[self.set_type]
-
         else:
             num_train = int(len(self.data)*0.7)
             num_test = int(len(self.data)*0.2)
