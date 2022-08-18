@@ -2,7 +2,6 @@ import numpy as np
 import pickle
 import torch
 import random
-from datetime import datetime
 
 
 def pkl_save(name, var):
@@ -69,10 +68,6 @@ def data_dropout(arr, p):
     res = arr.copy()
     res[mask.reshape(B, T)] = np.nan
     return res
-
-def name_with_datetime(prefix='default'):
-    now = datetime.now()
-    return prefix + '_' + now.strftime("%Y%m%d_%H%M%S")
 
 def init_dl_program(
     device_name,
