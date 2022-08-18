@@ -3,7 +3,7 @@
 ![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)
 ![PyTorch 1.9.0](https://img.shields.io/badge/PyTorch%20-%23EE4C2C.svg?style=plastic)
 
-This repository contains the official implementation for the paper [Fast Transformer for Time-Series Forecasting].
+This repository contains the official implementation for the paper [TS-Fastformer: Fast Transformer for Time-Series Forecasting].
 
 ## Requirements
 
