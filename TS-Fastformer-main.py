@@ -3,7 +3,7 @@ import argparse
 import os
 import time
 
-from utils.utils import init_dl_program, name_with_datetime
+from utils.utils import init_dl_program
 from utils.data_utils import load_forecast_csv
 from models.TS_Fastformer import Run_TS_Fastformer
 from models.TS2Vec import TS2Vec
