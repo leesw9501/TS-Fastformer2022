@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 ## Data
 
-The datasets can be obtained and put into `datasets/` folder in the following way:
+The datasets can be obtained and put into `data/` folder in the following way:
 
 * [ETT datasets](https://github.com/zhouhaoyi/ETDataset) should be placed at `data/ETTh1.csv`, `data/ETTh2.csv` and `data/ETTm1.csv`.
 * [KPVPG datasets](https://github.com/leesw9501/TS-Fastformer2022/tree/main/data) should be placed at `data/KPVPG.csv`.
