@@ -24,16 +24,18 @@ def load_forecast_csv(root, name, target):
     dt_embed = _get_time_features(data.index)
     n_covariate_cols = dt_embed.shape[-1]
     
-    if name in ('ETTh1', 'ETTh2', 'ETTm1', 'ETTm2'):
-        data = data[['OT']]
-    elif name == 'KPVPG':
-        data = data[['device_1']]
-    elif name == 'ECL':
-        data = data[['MT_320']]
-    elif name == 'electricity':
-        data = data[['MT_001']]
-    else:
-        data = data.iloc[[target]]
+    if target == None:
+        if name in ('ETTh1', 'ETTh2', 'ETTm1', 'ETTm2'):
+            target = 'OT'
+        elif name == 'KPVPG':
+            target = 'device_1'
+        elif name == 'ECL':
+            target = 'MT_320'
+        elif name == 'electricity':
+            target = 'MT_001'
+            
+    print('target :', target)
+    data = data[[target]]
         
     data = data.to_numpy()
     if name == 'ETTh1' or name == 'ETTh2' or name == 'KPVPG':
