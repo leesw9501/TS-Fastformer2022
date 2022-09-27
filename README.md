@@ -25,7 +25,7 @@ The datasets can be obtained and put into `data/` folder in the following way:
 * [ETT datasets](https://github.com/zhouhaoyi/ETDataset) should be placed at `data/ETTh1.csv`, `data/ETTh2.csv` and `data/ETTm1.csv`.
 * [KPVPG datasets](https://github.com/leesw9501/TS-Fastformer2022/tree/main/data) should be placed at `data/KPVPG.csv`.
 * [ELD dataset](https://archive.ics.uci.edu/ml/datasets/ElectricityLoadDiagrams20112014) should be preprocessed using `data/preprocess_ELD.py` and placed at `data/ELD.csv`.
-* [ECL dataset](https://drive.google.com/drive/folders/1ohGYWWohJlOlb2gsGTeEq3Wii2egnEPR) should be preprocessed using `data/preprocess_ECL.py`
+* [ECL dataset](https://drive.google.com/drive/folders/1ohGYWWohJlOlb2gsGTeEq3Wii2egnEPR) should be placed at `data/ECL.csv`.
 
 
 ## Usage
