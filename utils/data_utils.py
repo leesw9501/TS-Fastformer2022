@@ -31,7 +31,7 @@ def load_forecast_csv(root, name, target):
             target = 'device_1'
         elif name == 'ECL':
             target = 'MT_320'
-        elif name == 'electricity':
+        elif name == 'ELD':
             target = 'MT_001'
             
     print('target :', target)
