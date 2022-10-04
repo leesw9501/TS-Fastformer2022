@@ -49,7 +49,7 @@ We provide a more detailed and complete command description for training and tes
 
 ```python
 python -u TS-Fastformer-main.py <dataset> <run_name>
---gpu <gpu> --seed <seed> --max_threads <max_threads> --root_path <root_path> --data_path <data_path> 
+--gpu <gpu> --seed <seed> --max_threads <max_threads> --root_path <root_path>
 --target <target> --checkpoints <checkpoints> --inverse <inverse>
 --pre_batch_size <pre_batch_size> --pre_lr <pre_lr> --pre_max_train_length <pre_max_train_length> 
 --pre_iters <pre_iters> --pre_epochs <pre_epochs>
@@ -70,7 +70,6 @@ The detailed descriptions about the arguments are as following:
 |seed SEED           |Random seed|
 |max_threads |The maximum allowed number of threads used by this process|
 |root_path |Root path of the data file|
-|data_path |Data file|
 |target |Target column name|
 |checkpoints |Location of model checkpoints|
 |inverse |Inverse output data|
