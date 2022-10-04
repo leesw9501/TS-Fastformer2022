@@ -17,7 +17,6 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=42, help='Random seed')
     parser.add_argument('--max_threads', type=int, default=None, help='The maximum allowed number of threads used by this process')
     parser.add_argument('--root_path', type=str, default='data/', help='Root path of the data file')
-    parser.add_argument('--data_path', type=str, default='KPVPG.csv', help='Data file')
     parser.add_argument('--target', type=str, default=None, help='Target column name')
     parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='Location of model checkpoints')
     parser.add_argument('--inverse', type=bool, default=False, help='Inverse output data')
