@@ -2,15 +2,14 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch import optim
-from torch.utils.data import DataLoader
 import torch.nn.functional as F
 import os
 import time
 import warnings
 
 from utils.utils import EarlyStopping, adjust_learning_rate, metric
-from utils.data_utils import forecast_Dataset 
-from models.models import PastAttentionDecoder, DataRepresentation
+from utils.data_utils import data_provider
+from models.models import PastAttentionDecoder
 
 warnings.filterwarnings('ignore')
 
@@ -18,59 +17,35 @@ warnings.filterwarnings('ignore')
 class Run_TS_Fastformer():
     def __init__(self, args):
         super(Run_TS_Fastformer, self).__init__()
-        self.repr_model = args.repr_model
-        self.device = args.device
-        self.scaler = args.scaler
-        self.learning_rate = args.lr
-        self.batch_size = args.batch_size
-        self.data = args.data_
-        self.data_name = args.dataset
-        self.patience = args.patience
-        self.epochs = args.epochs
-        self.LT_len = args.LT_len
-        self.ST_len = args.ST_len
-        self.Trg_len = args.Trg_len
+        self.args = args
 
+        self.patience = args.patience
+        self.Trg_len = args.Trg_len
+        self.scaler = args.scaler
+        self.lr = args.lr
+        self.epochs = args.epochs
         self.model = TS_Fastformer(
-        LT_in = args.LT_in,
-        ST_in = args.ST_in, 
-        Trg_out = args.Trg_out,
-        Trg_len = args.Trg_len,
-        model_dim = args.model_dim, 
-        n_heads = args.n_heads,
-        dec_layers = args.dec_layers, 
-        fcn_dim = args.fcn_dim,
-        dropout = args.dropout,
-        device = args.device
-        ).to(self.device)
+            In_dim = args.In_dim,
+            LT_len = args.LT_len,
+            ST_len = args.ST_len,
+            Trg_len = args.Trg_len,
+            LT_win = args.LT_win,
+            ST_win = args.ST_win,
+            model_dim = args.model_dim, 
+            n_heads = args.n_heads,
+            dec_layers = args.dec_layers, 
+            fcn_dim = args.fcn_dim,
+            dropout = args.dropout
+        ).cuda()
 
 
     def _get_data(self, flag):
 
-        Data = forecast_Dataset
-
-        if flag == 'test':
-            shuffle_flag = False
-        else:
-            shuffle_flag = True
-        drop_last = True
-        batch_size = self.batch_size
-        data_set = Data(
-            data = self.data,
-            name = self.data_name,
-            flag=flag,
-            size=[self.LT_len, self.ST_len, self.Trg_len]
-        )
-        data_loader = DataLoader(
-            data_set,
-            batch_size=batch_size,
-            shuffle=shuffle_flag,
-            drop_last=drop_last)
-
+        data_set, data_loader = data_provider(self.args, flag)
         return data_loader
 
     def _select_optimizer(self):
-        model_optim = optim.AdamW(self.model.parameters(), lr=self.learning_rate)
+        model_optim = optim.Adam(self.model.parameters(), lr=self.lr)
         return model_optim
     
     def _select_criterion(self):
@@ -80,8 +55,15 @@ class Run_TS_Fastformer():
     def vali(self, vali_loader, criterion):
         self.model.eval()
         total_loss = []
-        for i, (batch_x, batch_y) in enumerate(vali_loader):
-            pred, true = self._process_one_batch(batch_x, batch_y)
+        for i, (batch_x, batch_r, batch_y) in enumerate(vali_loader):
+            
+            batch_x = batch_x.float().cuda()
+            batch_r = batch_r.float().cuda()
+            true = batch_y.float().cuda()
+
+            with torch.no_grad():
+                pred, attn = self.model(batch_x, batch_r)
+            
             loss = criterion(pred.detach().cpu(), true.detach().cpu())
             total_loss.append(loss)
         total_loss = np.average(total_loss)
@@ -101,16 +83,18 @@ class Run_TS_Fastformer():
         criterion =  self._select_criterion()
 
         for epoch in range(self.epochs):
-            iter_count = 0
             train_loss = []
             
             self.model.train()
             epoch_time = time.time()
-            for i, (batch_x,batch_y) in enumerate(train_loader):
-                iter_count += 1
-                
+            for i, (batch_x, batch_r, batch_y) in enumerate(train_loader):
                 model_optim.zero_grad()
-                pred, true = self._process_one_batch(batch_x, batch_y)
+
+                batch_x = batch_x.float().cuda()
+                batch_r = batch_r.float().cuda()
+                true = batch_y.float().cuda()
+
+                pred, attn = self.model(batch_x, batch_r)
                 
                 loss = criterion(pred, true)
                 train_loss.append(loss.item())
@@ -134,10 +118,10 @@ class Run_TS_Fastformer():
                 print("Early stopping")
                 break
 
-            adjust_learning_rate(model_optim, epoch+1, self.learning_rate)
+            adjust_learning_rate(model_optim, epoch+1, self.lr)
             
         best_model_path = path+'/'+'checkpoint_' + str(num) + '.pth'
-        self.model.load_state_dict(torch.load(best_model_path, map_location=self.device))
+        self.model.load_state_dict(torch.load(best_model_path, map_location=torch.device('cuda:0')))
         
         return self.model
 
@@ -149,8 +133,13 @@ class Run_TS_Fastformer():
         preds = []
         trues = []
         
-        for i, (batch_x, batch_y) in enumerate(test_loader):
-            pred, true = self._process_one_batch(batch_x, batch_y)
+        for i, (batch_x, batch_r, batch_y) in enumerate(test_loader):
+            batch_x = batch_x.float().cuda()
+            batch_r = batch_r.float().cuda()
+            true = batch_y.float().cuda()
+
+            with torch.no_grad():
+                pred, attn = self.model(batch_x, batch_r)
             preds.append(pred.detach().cpu().numpy())
             trues.append(true.detach().cpu().numpy())
 
@@ -177,47 +166,71 @@ class Run_TS_Fastformer():
 
         return
 
-    def _process_one_batch(self, batch_x, batch_y):
-        # Long-term input
-        batch_x = batch_x.float().to(self.device)
-        batch_repr_x = self.repr_model.encode(batch_x).float().to(self.device)
-
-        # Short-term input
-        ST_inp = batch_x[:,-self.ST_len:, :]
-        ST_repr_inp = batch_repr_x[:,-self.ST_len:, :]
-        
-        outputs = self.model(batch_x, batch_repr_x, ST_inp, ST_repr_inp)
-
-        f_dim = -1
-        batch_y = batch_y[:,:,f_dim:].float().to(self.device)
-
-        return outputs, batch_y
 
 class TS_Fastformer(nn.Module):
-    def __init__(self, LT_in, ST_in, Trg_out, Trg_len, model_dim=512, n_heads=8, 
-                dec_layers=4, fcn_dim=2048, dropout=0.0, device=torch.device('cuda:0')):
+    def __init__(self, In_dim, LT_len, ST_len, Trg_len, LT_win, ST_win, model_dim=128, n_heads=4, 
+                dec_layers=3, fcn_dim=512, dropout=0.3, device=torch.device('cuda:0')):
         super(TS_Fastformer, self).__init__()
-        self.Trg_len = Trg_len
+        self.In_dim = In_dim
+        self.LT_win = LT_win
+        self.ST_win = ST_win
 
-        self.LT_TPE = DataRepresentation(LT_in, model_dim, dropout)
-        self.norm1 = torch.nn.LayerNorm(model_dim)
+        self.ST_proj = nn.Linear(model_dim, In_dim)
+
+        self.linear_x = nn.Linear(LT_win, model_dim)
+        self.linear_y = nn.Linear(ST_win, model_dim)
+
+        pos_x = torch.empty((LT_len//LT_win, model_dim))
+        nn.init.uniform_(pos_x, -0.01, 0.01)
+        self.pos_x = nn.Parameter(pos_x, requires_grad=True)
         
-        self.ST_TPE = DataRepresentation(ST_in, model_dim, dropout)
-        self.norm2 = torch.nn.LayerNorm(model_dim)
+        pos_r = torch.empty((ST_len//ST_win, model_dim))
+        nn.init.uniform_(pos_r, -0.01, 0.01)
+        self.pos_r = nn.Parameter(pos_r, requires_grad=True)
 
         self.Past_Att_Dec = PastAttentionDecoder(hidden_dim = model_dim, 
                             n_layers = dec_layers, n_heads = n_heads, pf_dim = fcn_dim,
                             dropout = dropout, device = device)
         
-        self.linear = nn.Linear(model_dim, Trg_out, bias=True)
+        self.flatten = nn.Flatten(start_dim=-2)
+        self.linear = nn.Linear(model_dim * (LT_len//LT_win), Trg_len)
 
-    def forward(self, x_LT_in, repr_LT_in, x_ST_in, repr_ST_in):
-        LT_TPE_out = repr_LT_in + self.LT_TPE(x_LT_in)
-        LT_TPE_out = self.norm1(LT_TPE_out)
+        self.dropout = nn.Dropout(dropout)
+        
+    def forward(self, x, repr):
+        r = self.ST_proj(repr)
 
-        ST_TPE_out = repr_ST_in + self.ST_TPE(x_ST_in)
-        ST_TPE_out = self.norm2(ST_TPE_out)
-        dec_out, attention = self.Past_Att_Dec(ST_TPE_out, LT_TPE_out)
-        dec_out = self.linear(dec_out)
+        #dim = tuple(range(1, x.ndim-1))
+        #print(dim)
+        
+        self.mean = torch.mean(x, dim=1, keepdim=True).detach()
+        x = x - self.mean
 
-        return dec_out[:,-self.Trg_len:,:] # [B, L, D]
+        x = x.permute(0,2,1)
+        r = r.permute(0,2,1)
+
+        x = x.unfold(dimension=-1, size=self.LT_win, step=self.LT_win) # x: [b x In_dim x token_num x window_len]
+        r = r.unfold(dimension=-1, size=self.ST_win, step=self.ST_win)
+
+        x = self.linear_x(x)
+        r = self.linear_y(r)
+
+        x = x.reshape(x.shape[0]*x.shape[1],x.shape[2],x.shape[3])
+        r = r.reshape(r.shape[0]*r.shape[1],r.shape[2],r.shape[3])
+
+        x = self.dropout(x + self.pos_x)
+        r = self.dropout(r + self.pos_r)
+        
+        x, attn = self.Past_Att_Dec(x, r)
+        x = x.reshape(-1, self.In_dim, x.shape[-2], x.shape[-1])
+        #x = x.permute(0,1,3,2)
+
+        x = self.flatten(x)
+        x = self.linear(x)
+        x = x.permute(0,2,1)
+        x = x + self.mean
+        
+
+        return x, attn
+
+

@@ -123,9 +123,8 @@ def init_dl_program(
 
 
 def adjust_learning_rate(optimizer, epoch, learning_rate):
-    # lr = args.learning_rate * (0.2 ** (epoch // 2))
 
-    lr_adjust = {epoch: learning_rate * (0.5 ** ((epoch-1) // 1))}
+    lr_adjust = {epoch: learning_rate * (0.9 ** ((epoch-1) // 1))}
 
     if epoch in lr_adjust.keys():
         lr = lr_adjust[epoch]
