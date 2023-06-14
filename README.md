@@ -88,8 +88,3 @@ The detailed descriptions about the arguments are as following:
 |patience |Early stopping patience|
 |lr |Learning rate of TS-Fastformer|
 |itr |Experiments times|
-
-## Acknowledgements
-The implementation of TS-Fastformer relies on resources from the following codebases and repositories, we thank the original authors for open-sourcing their work.
-* https://github.com/salesforce/CoST
-* https://github.com/zhouhaoyi/Informer2020
