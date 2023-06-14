@@ -1,17 +1,18 @@
 # TS-Fastformer: Fast Transformer for Time-Series Forecasting
 
-![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)
-![PyTorch 1.9.0](https://img.shields.io/badge/PyTorch%20-%23EE4C2C.svg?style=plastic)
+![Python 3.8.10](https://img.shields.io/badge/python-3.8-green.svg?style=plastic)
+![PyTorch 2.0.1](https://img.shields.io/badge/PyTorch%20-%23EE4C2C.svg?style=plastic)
 
 This repository contains the official implementation for the paper [TS-Fastformer: Fast Transformer for Time-Series Forecasting].
 
 ## Requirements
 
-- Python 3.6
-- numpy == 1.19.5
-- pandas == 1.1.5
-- scikit-learn == 0.24.1
-- torch == 1.9.0
+- Python 3.8.10
+- numpy==1.23.5
+- pandas==2.0.1
+- scikit-learn==1.2.2
+- torch==2.0.0+cu118
+- einops==0.6.1
 
 The dependencies can be installed by:
 ```bash
@@ -30,18 +31,10 @@ The datasets can be obtained and put into `data/` folder in the following way:
 
 
 ## Usage
-Commands for training and testing TS-Fastformer on KPVPG respectively:
+Commands for training and testing TS-Fastformer on WTH:
 
 ```bash
-python -u TS-Fastformer-main.py KPVPG RUN --gpu 0 --max_threads 8 --LT_len 48 --ST_len 24 --Trg_len 24 --itr 10 --batch_size 32
-
-python -u TS-Fastformer-main.py KPVPG RUN --gpu 0 --max_threads 8 --LT_len 96 --ST_len 48 --Trg_len 48 --itr 10 --batch_size 32
-
-python -u TS-Fastformer-main.py KPVPG RUN --gpu 0 --max_threads 8 --LT_len 336 --ST_len 168 --Trg_len 168 --itr 10 --batch_size 32
-
-python -u TS-Fastformer-main.py KPVPG RUN --gpu 0 --max_threads 8 --LT_len 672 --ST_len 336 --Trg_len 336 --itr 10 --batch_size 32
-
-python -u TS-Fastformer-main.py KPVPG RUN --gpu 0 --max_threads 8 --LT_len 1440 --ST_len 720 --Trg_len 720 --itr 10 --batch_size 32
+python -u TS-Fastformer-main.py WTH RUN --gpu 2 --Trg_len 720 --itr 1 --batch_size 128 --model_dim 128
 ```
 
 More parameter information please refer to ```python -u TS-Fastformer-main.py -h```.
@@ -51,12 +44,12 @@ We provide a more detailed and complete command description for training and tes
 ```python
 python -u TS-Fastformer-main.py <dataset> <run_name>
 --gpu <gpu> --seed <seed> --max_threads <max_threads> --root_path <root_path>
---target <target> --checkpoints <checkpoints> --inverse <inverse>
---pre_batch_size <pre_batch_size> --pre_lr <pre_lr> --pre_max_train_length <pre_max_train_length> 
---pre_iters <pre_iters> --pre_epochs <pre_epochs>
---dropout <dropout> --LT_len <LT_len> --ST_len <ST_len> --Trg_len <Trg_len> 
---LT_in <LT_in> --ST_in <ST_in> --Trg_out <Trg_out> 
---n_heads <n_heads> --dec_layers <dec_layers> --model_dim <model_dim> --fcn_dim <fcn_dim> 
+--target <target> --checkpoints <checkpoints> --inverse <inverse> --dropout <dropout>
+--pre_dim <pre_dim> --pre_batch_size <pre_batch_size> --pre_lr <pre_lr> 
+--pre_max_train_length <pre_max_train_length> --pre_iters <pre_iters> --pre_epochs <pre_epochs>
+--LT_len <LT_len> --ST_len <ST_len> --Trg_len <Trg_len> 
+--In_dim <In_dim> --Out_dim <Out_dim> --LT_win <LT_win> --ST_win <ST_win> 
+--n_heads <n_heads> --dec_layers <dec_layers> --model_dim <model_dim>
 --epochs <epochs> --batch_size <batch_size> 
 --patience <patience> --lr <lr> --itr <itr>
 ```
@@ -74,22 +67,22 @@ The detailed descriptions about the arguments are as following:
 |target |Target column name|
 |checkpoints |Location of model checkpoints|
 |inverse |Inverse output data|
+|dropout |Dropout rate|
+|pre_dim |Representation Vector Dimension of pretrain|
 |pre_batch_size |Batch size of pretrain|
 |pre_lr |Learning rate of pretrain|
-|pre_max_train_length |For sequence with a length greater than <max_train_length>, it would be cropped into some sequences, each of which has a length less than <max_train_length>|
 |pre_iters |Number of iterations|
 |pre_epochs |Number of epochs|
-|dropout |Dropout rate|
 |LT_len | Long-term input length|
 |ST_len |Short-term input length|
 |Trg_len |Target length|
-|LT_in |Long-term input dimension|
-|ST_in |Short-term input dimension|
-|Trg_out |Target dimension|
+|In_dim |Input dimension|
+|Out_dim |Output dimension|
+|LT_win |Long-term window size|
+|ST_win |Short-term window size|
 |n_heads |Num of heads|
 |dec_layers |Num of decoder layers|
 |model_dim |Dimension of model|
-|fcn_dim |Dimension of fcn|
 |epochs |Train epochs of TS-Fastformer|
 |batch_size |Batch size of TS-Fastformer|
 |patience |Early stopping patience|
