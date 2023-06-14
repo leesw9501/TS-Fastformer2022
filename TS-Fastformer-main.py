@@ -20,15 +20,14 @@ if __name__ == '__main__':
     parser.add_argument('--target', type=str, default=None, help='Target column name')
     parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='Location of model checkpoints')
     parser.add_argument('--inverse', type=bool, default=False, help='Inverse output data')
+    parser.add_argument('--dropout', type=float, default=0.3, help='Dropout rate')
 
     #pre-training model parameters
     parser.add_argument('--pre_dim', type=int, default=128, help='Representation Vector Dimension of pretrain ')
     parser.add_argument('--pre_batch_size', type=int, default=128, help='Batch size of pretrain')
     parser.add_argument('--pre_lr', type=float, default=0.001, help='Learning rate of pretrain')
-    parser.add_argument('--pre_max_train_length', type=int, default=3000, help='For sequence with a length greater than <max_train_length>, it would be cropped into some sequences, each of which has a length less than <max_train_length>')
     parser.add_argument('--pre_iters', type=int, default=100, help='Number of iterations')
     parser.add_argument('--pre_epochs', type=int, default=100, help='Number of epochs')
-    parser.add_argument('--dropout', type=float, default=0.3, help='Dropout rate')
 
     #TS-Fastformer model parameters
     parser.add_argument('--LT_len', type=int, default=336, help='Long-term input length')
