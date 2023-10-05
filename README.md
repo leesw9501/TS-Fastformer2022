@@ -60,8 +60,8 @@ The detailed descriptions about the arguments are as following:
 | --- | --- |
 |dataset               |Dataset name|
 |run_name              |The folder name used to save model, output and evaluation metrics. This can be set to any word|
-|gpu GPU             |Gpu number|
-|seed SEED           |Random seed|
+|gpu             |Gpu number|
+|seed           |Random seed|
 |max_threads |The maximum allowed number of threads used by this process|
 |root_path |Root path of the data file|
 |target |Target column name|
