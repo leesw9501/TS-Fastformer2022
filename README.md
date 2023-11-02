@@ -4,7 +4,8 @@
 ![PyTorch 2.0.1](https://img.shields.io/badge/PyTorch%20-%23EE4C2C.svg?style=plastic)
 
 This repository contains the official implementation for the paper [TS-Fastformer: Fast Transformer for Time-Series Forecasting](https://dl.acm.org/doi/10.1145/3630637).
-This paper was accepted by ACM TIST on October 19, 2023. [KUDOS Link](https://www.growkudos.com/publications/10.1145%25252F3630637/reader)
+
+This paper was accepted by [ACM TIST](https://dl.acm.org/journal/tist) on October 19, 2023. [KUDOS Link](https://www.growkudos.com/publications/10.1145%25252F3630637/reader)
 
 
 ## Requirements
