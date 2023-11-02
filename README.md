@@ -5,7 +5,7 @@
 
 This repository contains the official implementation for the paper [TS-Fastformer: Fast Transformer for Time-Series Forecasting](https://dl.acm.org/doi/10.1145/3630637).
 
-This paper was accepted by [ACM TIST](https://dl.acm.org/journal/tist) on October 19, 2023. [KUDOS Link](https://www.growkudos.com/publications/10.1145%25252F3630637/reader)
+This paper was accepted by [ACM TIST](https://www.growkudos.com/publications/10.1145%25252F3630637/reader) on October 19, 2023.
 
 
 ## Requirements
